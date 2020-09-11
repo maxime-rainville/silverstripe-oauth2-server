@@ -18,4 +18,6 @@ class OauthAdmin extends ModelAdmin
         AccessToken::class,
         Scope::class
     ];
+
+    private static $menu_icon_class = 'font-icon-shield';
 }

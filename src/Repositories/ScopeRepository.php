@@ -37,8 +37,6 @@ class ScopeRepository implements ScopeRepositoryInterface
             return $this->clientGrant($scopes, $clientEntity);
         }
 
-        var_dump($grantType);
-
         // only check if we have a user, should a client have scopes?
         if (empty($userIdentifier)) {
 

@@ -11,7 +11,7 @@
     ],
     "require": {
         "silverstripe/framework": "^4.0",
-        "league/oauth2-server": "^6.0",
+        "league/oauth2-server": "^8.0",
         "silverstripe/vendor-plugin": "^1.0",
         "robbie/psr7-adapters": "1.1.x-dev",
         "PHP": ">=7.1",

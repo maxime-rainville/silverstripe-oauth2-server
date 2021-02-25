@@ -117,6 +117,8 @@ class Client extends DataObject
             'ParentID'
         ));
 
+        $fields->dataFieldByName('Title')->setAttribute('required', 'required');
+
         if ($this->isInDB()) {
             $permissionsField->setRecord(ArrayList::create([$this]));
             if ($secret = $this->retrievePlaintextSecret()) {
@@ -135,6 +137,17 @@ class Client extends DataObject
         }
 
         return $fields;
+    }
+
+    public function validate()
+    {
+        $results = parent::validate();
+
+        if (empty(trim($this->Title))) {
+            $results->addFieldError('Title', 'Field is required');
+        }
+
+        return $results;
     }
 
     /**

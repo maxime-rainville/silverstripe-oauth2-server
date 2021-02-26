@@ -9,6 +9,7 @@ use Lcobucci\JWT\Signer\Key;
 use Lcobucci\JWT\Signer\Rsa\Sha256;
 use League\OAuth2\Server\CryptKey;
 use League\OAuth2\Server\Entities\AccessTokenEntityInterface;
+use League\OAuth2\Server\Entities\ClientEntityInterface;
 use League\OAuth2\Server\Entities\Traits\AccessTokenTrait;
 use League\OAuth2\Server\Entities\Traits\EntityTrait;
 use League\OAuth2\Server\Entities\Traits\TokenEntityTrait;
@@ -23,8 +24,9 @@ class AccessTokenEntity implements AccessTokenEntityInterface
      * @param null|string $userIdentifier The identifier of the user.
      * @param array       $scopes         The scopes to assign the user.
      */
-    public function __construct(?string $userIdentifier, array $scopes)
+    public function __construct(ClientEntityInterface $client, ?string $userIdentifier, array $scopes)
     {
+        $this->setClient($client);
         $this->setUserIdentifier($userIdentifier);
 
         foreach ($scopes as $scope) {
@@ -32,39 +34,6 @@ class AccessTokenEntity implements AccessTokenEntityInterface
         }
     }
 
-    /**
-     * Generate a JWT from the access token
-     *
-     * @param CryptKey $privateKey
-     *
-     * @return string
-     */
-    public function convertToJWT(CryptKey $privateKey)
-    {
-        $now = new DateTimeImmutable();
-        $expire = $now->setTimestamp($this->getExpiryDateTime()->getTimestamp());
-
-        $tokenBuilder = (new Builder())
-            ->setAudience($this->getClient()->getIdentifier())
-            ->setId($this->getIdentifier())
-            ->setIssuedAt($now)
-            ->setNotBefore($now)
-            ->setExpiration($expire)
-            ->setSubject($this->getUserIdentifier())
-            ->set('scopes', $this->getScopes());
-
-        // add user name to claims
-        if ($this->getUserIdentifier()) {
-            $userEntity = $this->getUserEntity();
-            $member = $userEntity->getMember();
-
-            $tokenBuilder->set('fn', $member ? $member->FirstName : null)
-                ->set('ln', $member ? $member->Surname : null);
-        }
-
-        return $tokenBuilder->sign(new Sha256(), new Key($privateKey->getKeyPath(), $privateKey->getPassPhrase()))
-            ->getToken();
-    }
 
     protected function getUserEntity()
     {

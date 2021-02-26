@@ -10,19 +10,17 @@ use const PHP_EOL;
 
 class ClientRepository implements ClientRepositoryInterface
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function getClientEntity($clientIdentifier, $grantType, $clientSecret = null, $mustValidateSecret = true)
+
+    public function getClientEntity($clientIdentifier)
     {
-        $client = Client::get()->filter([
+        return Client::get()->filter([
            'Identifier' => $clientIdentifier
         ])->first();
+    }
 
-        if ($mustValidateSecret && $client && !$client->validateSecret($clientSecret)) {
-            $client = null;
-        }
-
-        return $client && $client->hasGrantType($grantType) ? new ClientEntity($clientIdentifier, $client->Title, 'something') : null;
+    public function validateClient($clientIdentifier, $clientSecret, $grantType)
+    {
+        $client = $this->getClientEntity($clientIdentifier);
+        return $client && $client->hasGrantType($grantType) && $client->validateSecret($clientSecret);
     }
 }

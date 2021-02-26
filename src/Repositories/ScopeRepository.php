@@ -50,6 +50,7 @@ class ScopeRepository implements ScopeRepositoryInterface
                 $approvedScopes[] = $scope;
             }
         }
+
         return $approvedScopes;
     }
 
@@ -62,9 +63,13 @@ class ScopeRepository implements ScopeRepositoryInterface
     private function clientGrant(array $scopes, ClientEntityInterface $clientEntity): array
     {
         /** @var Client $client */
-        $client = Client::get()->filter('Identifier', $clientEntity->getIdentifier())->first();
-        if (!$client) {
-            throw new LogicException('Cannot finalizeScopes without a valid client.');
+        if ($clientEntity instanceof Client) {
+            $client = $clientEntity;
+        } else {
+            $client = Client::get()->filter('Identifier', $clientEntity->getIdentifier())->first();
+            if (!$client) {
+                throw new LogicException('Cannot finalizeScopes without a valid client.');
+            }
         }
 
         $allowedScopes = $client->Permissions()->map('Code', 'Code')->toArray();

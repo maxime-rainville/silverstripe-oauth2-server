@@ -5,6 +5,7 @@ namespace AdvancedLearning\Oauth2Server\Models;
 use AdvancedLearning\Oauth2Server\DBSecret;
 use AdvancedLearning\Oauth2Server\Form\PermissionCheckboxSetField;
 use Faker\Provider\Text;
+use League\OAuth2\Server\Entities\ClientEntityInterface;
 use SilverStripe\Control\HTTPRequest;
 use SilverStripe\Control\Session;
 use SilverStripe\Core\Injector\Injector;
@@ -28,7 +29,7 @@ use SilverStripe\ORM\DataObject;
  * @property int $RevokerID
  * @method DataList Permissions()
  */
-class Client extends DataObject
+class Client extends DataObject implements ClientEntityInterface
 {
 
     const SESSION_SECRET_KEY = 'OAuthClientSecret';
@@ -192,4 +193,24 @@ class Client extends DataObject
 //        // No user is ever allowed to delete a client.
 //        return false;
 //    }
+
+    public function getIdentifier()
+    {
+        return $this->getField('Identifier');
+    }
+
+    public function getName()
+    {
+        $this->getTitle();
+    }
+
+    public function getRedirectUri()
+    {
+        return '';
+    }
+
+    public function isConfidential()
+    {
+        return true;
+    }
 }
